@@ -2,6 +2,7 @@ const db = require('./config')();
 const { type, user } = require('./model');
 init();
 async function init() {
-    let data = await user.findOne({ username: '2362086452', password: 'ylhm4523' });
+    await type.create({ name: '前端' });
+    let data = await type.find();
     console.log(data);
 }

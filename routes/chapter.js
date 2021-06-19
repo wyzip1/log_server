@@ -7,20 +7,21 @@ router.get('/list', async (req, res) => {
     let { page, size } = req.body;
     try {
         let docs = await chapter.find().skip((page - 1) * size).limit(size * 1).exec();
+
         for (let doc of docs) {
             let udata = await user.findById(doc.userId);
             let ctype = await type.findById(doc.typeId);
-            doc.user = udata;
-            doc.type = ctype;
+            doc._doc.user = udata;
+            doc._doc.type = ctype;
         }
-        res.json(success(doc, '查询文章列表成功'));
+        res.json(success(docs, '查询文章列表成功'));
     } catch (err) { res.json(error('查询文章列表异常', err)); }
 })
 
 router.post('/add', async (req, res) => {
     let { title, userId, content, typeId } = req.body;
     try {
-        let data = await chapter.create({ title, userId, updateTime: new Date(), typeId: typeId | '0' });
+        let data = await chapter.create({ title, userId, updateTime: new Date(), typeId: typeId || '0' });
         let c = await _content.create({ chapterId: data._id, content });
         data.content = c;
         res.json(success(data, '添加文章日志成功'));

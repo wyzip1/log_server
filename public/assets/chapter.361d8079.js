@@ -1,0 +1,1 @@
+import{r as t}from"./util.232713f0.js";function r(r){return t({url:"/chapter/add",type:"POST",params:r})}function a(r){return t({url:"/chapter/list",type:"GET",params:r})}function e(r){return t({url:"/content/detail/"+r,type:"GET"})}export{r as a,e as b,a as g};
