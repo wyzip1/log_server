@@ -23,8 +23,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use((req, res, next) => {
-    let allow = ['/login'];
-    if (allow.includes(req.url)) return next();
+    let forbid = ['/chapter/add', '/chapter/update', '/chapter/del', '/auth'];
+    console.log(req.url);
+    if (!forbid.includes(req.url)) return next();
     try {
         jwt.verify(req.headers.authorization, 'learn_log');
         next()
