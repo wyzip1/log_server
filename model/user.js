@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 let userSchema = mongoose.Schema({
-    username: String,
+    account: String,
     password: String,
     createTime: { type: Date, default: new Date() },
     updateTime: Date,
@@ -13,7 +13,7 @@ let user = mongoose.model('user', userSchema, 'user');
 user.find().countDocuments((err, count) => {
     if (err) throw err;
     if (!count) {
-        user.create({ username: '2362086452', password: 'ylhm4523', lv: Infinity })
+        user.create({ account: '2362086452', password: 'ylhm4523', lv: Infinity })
             .then(() => console.log('账号初始化成功'))
             .catch(err => console.log('账号初始化失败', err));
     }

@@ -1,1 +1,0 @@
-import{E as t}from"./vendor.3ed85b8c.js";const e={GET:"get",POST:"post",PUT:"put",DELETE:"delete"};function a({type:a,url:r,params:n}){return new Promise(((s,E)=>{["GET","DELETE"].includes(a)?t[e[a]](r,{params:n}).then((t=>s(t.data))).catch((t=>E(t))):t[e[a]](r,n).then((t=>s(t.data))).catch((t=>E(t)))}))}export{a as r};

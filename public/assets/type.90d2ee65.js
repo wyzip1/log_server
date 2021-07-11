@@ -1,0 +1,1 @@
+import{r as t}from"./util.cdae3ab6.js";function r(r=!0){return t({url:r?"/type/list":"/type/notloglist",type:"GET"})}function e(r){return t({url:"/type/add",type:"POST",params:r})}function a(r){return t({url:"/type/del",type:"DELETE",params:r})}export{e as a,a as d,r as g};

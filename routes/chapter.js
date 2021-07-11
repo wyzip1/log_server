@@ -1,43 +1,100 @@
 const express = require('express');
 const router = express.Router();
 const { chapter, content: _content, user, type } = require('../model');
-const { success, error } = require('./util');
+const { success, error, logId } = require('./util');
 
 router.get('/list', async (req, res) => {
-    let { page, size } = req.body;
+    let { page, size, typeId, title } = req.query;
+    let regTitle = new RegExp(title);
+    let condition = [{ title: { $regex: regTitle } }];
+    typeId && condition.push({ typeId });
     try {
-        let docs = await chapter.find().skip((page - 1) * size).limit(size * 1).exec();
+        let docs = await chapter.find({ $and: condition, $nor: [{ typeId: await logId() }] })
+            .skip((page - 1) * size)
+            .sort({ _id: -1 }).limit(size * 1).exec();
 
+        // 计算总计页数
+        let count = await chapter.find({ $nor: [{ typeId: await logId() }] }).countDocuments();
+        let _total = Math.floor(count / size);
+        let total_page;
+        if (count < size) total_page = 1;
+        else total_page = count % size ? _total + 1 : _total;
+
+        // 绑定信息
         for (let doc of docs) {
             let udata = await user.findById(doc.userId);
             let ctype = await type.findById(doc.typeId);
             doc._doc.user = udata;
             doc._doc.type = ctype;
         }
-        res.json(success(docs, '查询文章列表成功'));
+        res.json(success({ docs, total_page }, '查询文章列表成功'));
     } catch (err) { res.json(error('查询文章列表异常', err)); }
 })
+
+router.get('/chapterInfo', async (req, res) => {
+    let { chapterId } = req.query;
+    try {
+        let doc = await chapter.findById(chapterId);
+        let content = await _content.findOne({ chapterId });
+        let _type = await type.findById(doc.typeId);
+        let _user = await user.findById(doc.userId);
+        doc._doc.content = content._doc.content;
+        doc._doc.type = _type._doc.name;
+        doc._doc.account = _user._doc.account;
+        res.json(success(doc, '查询文章信息成功'));
+    } catch (err) { res.json(error('查询文章信息失败', err)); }
+
+})
+
+router.get('/log', async (req, res) => {
+    let { page, size, title } = req.query;
+    let regTitle = new RegExp(title);
+    let typeId = await logId();
+    try {
+        let docs = await chapter.find({ $and: [{ title: { $regex: regTitle }, typeId }] })
+            .skip((page - 1) * size).sort({ _id: -1 })
+            .limit(size * 1).exec();
+
+        // 计算总计页数
+        let count = await chapter.find({ typeId }).countDocuments();
+        let _total = Math.floor(count / size);
+        let total_page;
+        if (count < size) total_page = 1;
+        else total_page = count % size ? _total + 1 : _total;
+
+        // 绑定信息
+        let ctype = await type.findById(typeId);
+        for (let doc of docs) {
+            let udata = await user.findById(doc.userId);
+            doc._doc.user = udata;
+            doc._doc.type = ctype;
+        }
+        res.json(success({ docs, total_page }, '查询日志成功'));
+    } catch (err) { res.json(error('查询日志列表异常', err)); }
+});
 
 router.post('/add', async (req, res) => {
     let { title, userId, content, typeId } = req.body;
     try {
         let data = await chapter.create({ title, userId, updateTime: new Date(), typeId: typeId || '0' });
         let c = await _content.create({ chapterId: data._id, content });
-        data.content = c;
+        data._doc.content = c;
         res.json(success(data, '添加文章日志成功'));
     } catch (err) { error('添加文章日志失败', err); }
 })
 
 router.put('/update', async (req, res) => {
-    let { chapterId, title, typeId } = req.body;
+    let { chapterId, title, typeId, content } = req.body;
     try {
         let data = chapter.findByIdAndUpdate(chapterId, { title, updateTime: new Date(), typeId });
+        let c = await _content.findByIdAndUpdate(chapterId, { content });
+        data._doc.content = c;
         res.json(success(data, '更新文章标题成功'));
     } catch (err) { error('更新文章标题失败', err) }
 })
 
 router.delete('/del', async (req, res) => {
-    let { chapterId } = req.body;
+    let { chapterId } = req.query;
     try {
         let content = await _content.find({ chapterId });
         let data1 = await _content.findByIdAndDelete(content._id);

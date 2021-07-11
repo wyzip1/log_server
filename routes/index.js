@@ -9,8 +9,8 @@ const type = require('./type');
 
 
 router.post('/login', function (req, res) {
-    let { username, password } = req.body;
-    user.findOne({ username, password }).then(data => {
+    let { account, password } = req.body;
+    user.findOne({ account, password }).then(data => {
         if (!data) return res.json(error('账号或密码错误'));
         let token = jwt.sign(data._doc, 'learn_log', { expiresIn: 60 * 60 * 24 });
         data._doc.token = token;
