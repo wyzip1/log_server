@@ -1,0 +1,1 @@
+import{r as t,o as n,g as r,h as e,T as _,w as a}from"./vendor.604b4b01.js";import{_ as s}from"./index.ab2eedc5.js";const c={},d={class:"container"};function i(f,p){const o=t("router-view");return n(),r("div",d,[e(_,{name:"fade"},{default:a(()=>[e(o)]),_:1})])}var m=s(c,[["render",i],["__scopeId","data-v-ddc82f84"]]);export{m as default};

@@ -5,7 +5,8 @@ let chapterSchema = mongoose.Schema({
     createTime: { type: Date, default: new Date() },
     updateTime: Date,
     userId: String,
-    typeId: String
+    typeId: String,
+    briefIntroduction: String
 });
 
 let chapter = mongoose.model('chapter', chapterSchema, 'chapter');

@@ -18,8 +18,18 @@ router.post('/login', function (req, res) {
     }).catch(err => res.json(error('登录异常', err)));
 });
 
+router.post('/register', function (req, res) {
+    let { account, password, username } = req.body;
+    user.create({ account, password, username }).then(data => {
+        res.json(success(data, '注册账号成功'));
+    }).catch(err => {
+        const msg = err.code === 11000 ? account + ' 已存在' : '注册异常'
+        res.json(error(msg, err));
+    });
+});
+
 router.post('/auth', function (req, res) {
-    res.json(success());
+    res.json(success({}, '验证成功'));
 });
 
 router.use('/chapter', chapterRouter);

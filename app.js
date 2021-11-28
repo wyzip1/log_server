@@ -24,13 +24,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
     let forbid = ['/chapter/add', '/chapter/update', '/chapter/del', '/auth'];
-    console.log(req.url);
     if (!forbid.includes(req.url)) return next();
     try {
         jwt.verify(req.headers.authorization, 'learn_log');
         next()
     } catch (error) {
-        res.json({ status: 1, msg: 'token验证失败' });
+        res.json({ status: 333, meta: { msg: 'token验证失败' } });
     }
 })
 app.use('/', indexRouter);

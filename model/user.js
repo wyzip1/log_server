@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 
 let userSchema = mongoose.Schema({
-    account: String,
+    account: {
+        type: String,
+        unique: true
+    },
     password: String,
+    username: String,
     createTime: { type: Date, default: new Date() },
     updateTime: Date,
     lv: { type: Number, default: 0 }
